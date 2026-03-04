@@ -1,3 +1,6 @@
 .vs/
 bin/
 obj/
+Data/financial_advisor.db
+Data/*.db
+appsettings.json
