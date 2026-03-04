@@ -48,7 +48,9 @@ public class OllamaService : IOllamaService
         catch (Exception ex)
         {
             _log.LogError(ex, "Ollama call failed");
-            return $"[LLM_ERROR: {ex.Message}]";
+            // Return in ReAct FINAL ANSWER format so the engine terminates cleanly
+            // rather than trying to parse "[LLM_ERROR: ...]" as a Thought/Action response.
+            return $"FINAL ANSWER: LLM call failed — {ex.Message}";
         }
     }
 

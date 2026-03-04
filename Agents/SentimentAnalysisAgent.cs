@@ -83,8 +83,14 @@ public class SentimentAnalysisAgent
         var score = new SentimentScore
         {
             Ticker           = ticker,
-            SentimentSummary = finalAnswer
+            SentimentSummary = finalAnswer ?? ""
         };
+
+        if (string.IsNullOrWhiteSpace(finalAnswer))
+        {
+            score.Overall = SentimentClass.Neutral;
+            return score;
+        }
 
         try
         {

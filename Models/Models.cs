@@ -61,6 +61,8 @@ public class AnalysisJob
     public List<StockReport> Reports      { get; set; } = new();
     public string?          ErrorMessage  { get; set; }
     public string?          OutputDir     { get; set; }
+    // Tickers that failed during processing, with their error reason.
+    public Dictionary<string, string> FailedTickers { get; set; } = new();
 }
 
 public enum JobStatus { Queued, Running, Completed, Failed }

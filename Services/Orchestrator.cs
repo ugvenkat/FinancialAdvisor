@@ -27,6 +27,7 @@ public class MultiAgentOrchestrator : IOrchestrator
     private readonly ChiefInvestmentOfficerAgent  _cioAgent;
     private readonly IMemoryStore                 _memory;
     private readonly IReportWriter                _writer;
+    private readonly AgentStatusTracker           _tracker;
     private readonly ILogger<MultiAgentOrchestrator> _log;
 
     public MultiAgentOrchestrator(
@@ -37,6 +38,7 @@ public class MultiAgentOrchestrator : IOrchestrator
         ChiefInvestmentOfficerAgent cioAgent,
         IMemoryStore memory,
         IReportWriter writer,
+        AgentStatusTracker tracker,
         ILogger<MultiAgentOrchestrator> log)
     {
         _dataAgent = dataAgent;
@@ -46,6 +48,7 @@ public class MultiAgentOrchestrator : IOrchestrator
         _cioAgent  = cioAgent;
         _memory    = memory;
         _writer    = writer;
+        _tracker   = tracker;
         _log       = log;
     }
 
@@ -59,6 +62,7 @@ public class MultiAgentOrchestrator : IOrchestrator
 
         await _memory.SaveJobAsync(job);
         _log.LogInformation("Job {Id} queued: {Tickers}", job.JobId, string.Join(", ", job.Tickers));
+        // TODO: store a CancellationTokenSource per job to support CancelJobAsync(jobId) in future.
         _ = Task.Run(() => RunJobAsync(job, request));
         return job;
     }
@@ -89,10 +93,12 @@ public class MultiAgentOrchestrator : IOrchestrator
                 catch (Exception ex)
                 {
                     _log.LogError(ex, "Failed to process {Ticker}", ticker);
+                    job.FailedTickers[ticker] = ex.Message;
+                    await _memory.SaveJobAsync(job);
                 }
             }
 
-            portfolio.ExecutiveSummary = BuildSummary(portfolio);
+            portfolio.ExecutiveSummary = BuildSummary(portfolio, job.FailedTickers);
             job.OutputDir    = await _writer.WriteReportAsync(job.JobId, portfolio);
             job.Status       = JobStatus.Completed;
             job.CompletedAt  = DateTime.UtcNow;
@@ -108,6 +114,8 @@ public class MultiAgentOrchestrator : IOrchestrator
         }
 
         await _memory.SaveJobAsync(job);
+        // Release in-memory tracking state — job is in a terminal state and persisted to SQLite.
+        _tracker.Clear(job.JobId);
     }
 
     private async Task<StockReport> ProcessTickerAsync(string jobId, string ticker, CancellationToken ct)
@@ -159,7 +167,7 @@ public class MultiAgentOrchestrator : IOrchestrator
         };
     }
 
-    private static string BuildSummary(PortfolioReport report)
+    private static string BuildSummary(PortfolioReport report, Dictionary<string, string> failedTickers)
     {
         var buys  = report.StockReports.Count(r => r.Recommendation.Action is Models.Action.Buy or Models.Action.StrongBuy);
         var holds = report.StockReports.Count(r => r.Recommendation.Action is Models.Action.Hold);
@@ -169,7 +177,12 @@ public class MultiAgentOrchestrator : IOrchestrator
             .OrderByDescending(r => r.Recommendation.Confidence)
             .FirstOrDefault();
 
-        return $"Analyzed {report.StockReports.Count} stock(s): {buys} Buy, {holds} Hold, {sells} Sell. " +
-               (best != null ? $"Top pick: {best.Ticker} ({best.Recommendation.Action}, {best.Recommendation.Confidence:F0}% confidence)." : "");
+        var summary = $"Analyzed {report.StockReports.Count} stock(s): {buys} Buy, {holds} Hold, {sells} Sell. " +
+                      (best != null ? $"Top pick: {best.Ticker} ({best.Recommendation.Action}, {best.Recommendation.Confidence:F0}% confidence)." : "");
+
+        if (failedTickers.Any())
+            summary += $" Failed: {string.Join(", ", failedTickers.Keys)}.";
+
+        return summary;
     }
 }

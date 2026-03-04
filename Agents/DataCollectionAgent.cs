@@ -78,6 +78,19 @@ public class DataCollectionAgent
             CollectedAt = DateTime.UtcNow
         };
 
+        if (string.IsNullOrWhiteSpace(finalAnswer))
+            return data;
+
+        // Strip markdown code fences the LLM sometimes wraps JSON in
+        finalAnswer = finalAnswer.Trim();
+        if (finalAnswer.Contains("```"))
+        {
+            var fenceStart = finalAnswer.IndexOf('\n', finalAnswer.IndexOf("```"));
+            var fenceEnd   = finalAnswer.LastIndexOf("```");
+            if (fenceStart >= 0 && fenceEnd > fenceStart)
+                finalAnswer = finalAnswer[(fenceStart + 1)..fenceEnd].Trim();
+        }
+
         try
         {
             // Try to extract JSON from the final answer

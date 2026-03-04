@@ -157,6 +157,9 @@ public class ReActEngine
                 agentName, ticker, MaxSteps);
         }
 
+        // Guarantee callers never receive a null FinalAnswer regardless of how the loop exited.
+        trace.FinalAnswer ??= string.Empty;
+
         return trace;
     }
 
@@ -195,7 +198,7 @@ public class ReActEngine
         var sb = new System.Text.StringBuilder();
         foreach (var (role, content) in history)
         {
-            sb.AppendLine(role == "user" ? "User: " + content : "Agent: " + content);
+            sb.AppendLine(role == "user" ? "User: " + content : "Assistant: " + content);
             sb.AppendLine();
         }
         return sb.ToString();

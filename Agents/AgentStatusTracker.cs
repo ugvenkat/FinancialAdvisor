@@ -1,4 +1,4 @@
-namespace FinancialAdvisor.Services;
+namespace FinancialAdvisor.Agents;
 
 /// <summary>
 /// Thread-safe in-memory tracker of what each agent is doing RIGHT NOW.
@@ -6,7 +6,7 @@ namespace FinancialAdvisor.Services;
 /// </summary>
 public class AgentStatusTracker
 {
-    private readonly Dictionary<string, JobStatus2> _jobs = new();
+    private readonly Dictionary<string, LiveJobStatus> _jobs = new();
     private readonly object _lock = new();
 
     public void Update(string jobId, string ticker, string agent, int step, string activity)
@@ -15,7 +15,7 @@ public class AgentStatusTracker
         {
             if (!_jobs.TryGetValue(jobId, out var job))
             {
-                job = new JobStatus2 { JobId = jobId };
+                job = new LiveJobStatus { JobId = jobId };
                 _jobs[jobId] = job;
             }
 
@@ -48,16 +48,22 @@ public class AgentStatusTracker
         }
     }
 
-    public JobStatus2? Get(string jobId)
+    public LiveJobStatus? Get(string jobId)
     {
         lock (_lock)
         {
             return _jobs.TryGetValue(jobId, out var j) ? j : null;
         }
     }
+
+    /// <summary>Remove a completed job's tracking state to prevent unbounded memory growth.</summary>
+    public void Clear(string jobId)
+    {
+        lock (_lock) _jobs.Remove(jobId);
+    }
 }
 
-public class JobStatus2
+public class LiveJobStatus
 {
     public string JobId { get; set; } = "";
     public DateTime LastUpdate { get; set; } = DateTime.UtcNow;

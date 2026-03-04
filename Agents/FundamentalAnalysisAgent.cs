@@ -85,7 +85,14 @@ public class FundamentalAnalysisAgent
 
     private static FundamentalScore ParseFundamentalScore(string ticker, string finalAnswer)
     {
-        var score = new FundamentalScore { Ticker = ticker, DetailedAnalysis = finalAnswer };
+        var score = new FundamentalScore { Ticker = ticker, DetailedAnalysis = finalAnswer ?? "" };
+
+        if (string.IsNullOrWhiteSpace(finalAnswer))
+        {
+            score.Score = 50;
+            score.Grade = "C";
+            return score;
+        }
 
         try
         {
@@ -122,6 +129,10 @@ public class FundamentalAnalysisAgent
         return score;
     }
 
+    // Section header keywords that should stop bullet collection, not be added as items
+    private static readonly string[] _sectionBreakers =
+        ["conclusion", "summary", "analysis", "overall", "note", "recommendation"];
+
     private static void ExtractScoreFromText(string text, FundamentalScore score)
     {
         // Try to find "score: 72" or "72/100" patterns
@@ -137,14 +148,20 @@ public class FundamentalAnalysisAgent
             @"grade[:\s]+([A-F][+-]?)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         score.Grade = gradeMatch.Success ? gradeMatch.Groups[1].Value.ToUpper() : GradeFromScore(score.Score);
 
-        // Extract bullet points as strengths/weaknesses
+        // Extract bullet points as strengths/weaknesses.
+        // Stop collecting when a new section header is encountered.
         var lines = text.Split('\n').Select(l => l.Trim().TrimStart('-', '•', '*', ' ')).ToList();
         var inStrengths  = false;
         var inWeaknesses = false;
         foreach (var line in lines)
         {
-            if (line.ToLower().Contains("strength")) { inStrengths = true; inWeaknesses = false; continue; }
-            if (line.ToLower().Contains("weakness") || line.ToLower().Contains("risk")) { inWeaknesses = true; inStrengths = false; continue; }
+            var lower = line.ToLower();
+            if (lower.Contains("strength")) { inStrengths = true; inWeaknesses = false; continue; }
+            if (lower.Contains("weakness") || lower.Contains("risk")) { inWeaknesses = true; inStrengths = false; continue; }
+
+            // Stop collecting if we hit a new section header
+            if (_sectionBreakers.Any(b => lower.StartsWith(b))) { inStrengths = false; inWeaknesses = false; continue; }
+
             if (inStrengths  && line.Length > 10) score.Strengths.Add(line);
             if (inWeaknesses && line.Length > 10) score.Weaknesses.Add(line);
         }

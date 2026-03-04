@@ -86,7 +86,14 @@ public class RiskAnalysisAgent
 
     private static RiskScore ParseRiskScore(string ticker, string finalAnswer)
     {
-        var score = new RiskScore { Ticker = ticker, RiskSummary = finalAnswer };
+        var score = new RiskScore { Ticker = ticker, RiskSummary = finalAnswer ?? "" };
+
+        if (string.IsNullOrWhiteSpace(finalAnswer))
+        {
+            score.Score = 50;
+            score.Level = RiskLevel.Medium;
+            return score;
+        }
 
         try
         {
@@ -125,10 +132,10 @@ public class RiskAnalysisAgent
         score.Score = scoreMatch.Success && double.TryParse(scoreMatch.Groups[1].Value, out var s) ? s : 50;
 
         var lower = text.ToLowerInvariant();
-        if (lower.Contains("very high") || lower.Contains("veryhigh")) score.Level = RiskLevel.VeryHigh;
-        else if (lower.Contains("high risk") || lower.Contains("high:")) score.Level = RiskLevel.High;
-        else if (lower.Contains("medium") || lower.Contains("moderate")) score.Level = RiskLevel.Medium;
-        else if (lower.Contains("low risk") || lower.Contains("low:")) score.Level = RiskLevel.Low;
+        if (lower.Contains("very high") || lower.Contains("veryhigh"))      score.Level = RiskLevel.VeryHigh;
+        else if (System.Text.RegularExpressions.Regex.IsMatch(lower, @"\bhigh\b")) score.Level = RiskLevel.High;
+        else if (lower.Contains("medium") || lower.Contains("moderate"))    score.Level = RiskLevel.Medium;
+        else if (System.Text.RegularExpressions.Regex.IsMatch(lower, @"\blow\b"))  score.Level = RiskLevel.Low;
         else score.Level = ParseRiskLevel("", score.Score);
 
         // Extract bullet points as risk factors

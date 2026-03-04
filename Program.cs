@@ -59,7 +59,8 @@ builder.Services.AddTransient<ChiefInvestmentOfficerAgent>();
 // Orchestrator
 builder.Services.AddSingleton<IOrchestrator, MultiAgentOrchestrator>();
 
-builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
+// For local use only; tighten for production.
+builder.Services.AddCors(o => o.AddPolicy("AllowAll", p =>
     p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
@@ -77,23 +78,29 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSerilogRequestLogging();
-app.UseCors();
+app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
+
+// Resolve the actual bound URL so the banner is never misleading.
+// Priority: ASPNETCORE_URLS env var → appsettings.json "Urls" → Kestrel default.
+var baseUrl = Environment.GetEnvironmentVariable("ASPNETCORE_URLS")?.Split(';').First()
+           ?? app.Configuration["Urls"]
+           ?? "http://localhost:5000";
 
 Log.Information("""
 
 ==============================================================
   Agentic Financial Investment Advisor - NET 8 WebAPI
   Pattern: ReAct (Reason - Act - Observe - Repeat)
-  API:     http://localhost:5000
-  Swagger: http://localhost:5000/swagger
-  
+  API:     {BaseUrl}
+  Swagger: {BaseUrl}/swagger
+
   DEBUG ENDPOINTS:
   Live status:  GET /api/analysis/{jobId}/live
   Agent traces: GET /api/analysis/{jobId}/traces
   Log file:     logs/advisor-YYYYMMDD.log
 ==============================================================
-""");
+""", baseUrl, baseUrl);
 
 app.Run();

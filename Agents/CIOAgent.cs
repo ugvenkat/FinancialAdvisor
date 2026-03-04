@@ -54,6 +54,10 @@ public class ChiefInvestmentOfficerAgent
               $"{rawData.AnalystRatings.Count(r => r.Rating.ToLower().Contains("sell") || r.Rating.ToLower().Contains("underperform"))} Sell"
             : "No analyst ratings available";
 
+        var fundamentalAnalysis = fundamental.DetailedAnalysis ?? "";
+        var sentimentSummary    = sentiment.SentimentSummary ?? "";
+        var riskSummary         = risk.RiskSummary ?? "";
+
         var goal = $"""
             You are the Chief Investment Officer. Make a final investment decision for {rawData.Ticker} ({rawData.CompanyName}).
 
@@ -63,17 +67,17 @@ public class ChiefInvestmentOfficerAgent
             Score: {fundamental.Score:F1}/100 | Grade: {fundamental.Grade}
             Strengths: {string.Join("; ", fundamental.Strengths.Take(3))}
             Weaknesses: {string.Join("; ", fundamental.Weaknesses.Take(3))}
-            Analysis: {fundamental.DetailedAnalysis[..Math.Min(300, fundamental.DetailedAnalysis.Length)]}
+            Analysis: {fundamentalAnalysis[..Math.Min(300, fundamentalAnalysis.Length)]}
 
             📰 SENTIMENT ANALYSIS AGENT REPORT:
             Overall: {sentiment.Overall} | Score: {sentiment.Score:+0.00;-0.00}
             Breakdown: {sentiment.BullishPercent:F0}% Bullish / {sentiment.NeutralPercent:F0}% Neutral / {sentiment.BearishPercent:F0}% Bearish
-            Summary: {sentiment.SentimentSummary[..Math.Min(300, sentiment.SentimentSummary.Length)]}
+            Summary: {sentimentSummary[..Math.Min(300, sentimentSummary.Length)]}
 
             ⚠️ RISK ANALYSIS AGENT REPORT:
             Level: {risk.Level} | Score: {risk.Score:F1}/100
             Key Risks: {string.Join("; ", risk.RiskFactors.Take(3))}
-            Summary: {risk.RiskSummary[..Math.Min(300, risk.RiskSummary.Length)]}
+            Summary: {riskSummary[..Math.Min(300, riskSummary.Length)]}
 
             👔 ANALYST CONSENSUS: {analystSummary}
 

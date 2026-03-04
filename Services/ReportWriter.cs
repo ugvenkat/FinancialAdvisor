@@ -100,7 +100,8 @@ public class ReportWriter : IReportWriter
             $"({r.UpsidePercent:+0.0;-0.0}%) | **Horizon:** {r.TimeHorizon} | **Risk:** {RiskEmoji(r.RiskLevel)} {r.RiskLevel}");
         sb.AppendLine();
         sb.AppendLine("#### 🏛️ CIO Investment Memo");
-        sb.AppendLine($"> {r.CIOSummary[..Math.Min(500, r.CIOSummary.Length)]}");
+        var cioSummary = r.CIOSummary ?? "";
+        sb.AppendLine($"> {cioSummary[..Math.Min(500, cioSummary.Length)]}");
         sb.AppendLine();
 
         // Agent score cards
@@ -161,7 +162,7 @@ public class ReportWriter : IReportWriter
         {
             sb.AppendLine($"---");
             sb.AppendLine($"## {trace.AgentName}");
-            sb.AppendLine($"**Goal:** {trace.Goal[..Math.Min(200, trace.Goal.Length)]}");
+            sb.AppendLine($"**Goal:** {(trace.Goal ?? "")[..Math.Min(200, (trace.Goal ?? "").Length)]}");
             sb.AppendLine($"**Steps:** {trace.TotalSteps} | **Succeeded:** {trace.Succeeded}");
             sb.AppendLine();
 
@@ -173,14 +174,21 @@ public class ReportWriter : IReportWriter
 
                 if (step.IsFinal)
                 {
-                    sb.AppendLine($"**✅ FINAL ANSWER:** {step.FinalAnswer[..Math.Min(400, step.FinalAnswer.Length)]}");
+                    var fa = step.FinalAnswer ?? "";
+                    sb.AppendLine($"**✅ FINAL ANSWER:** {fa[..Math.Min(400, fa.Length)]}");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(step.Action))
-                        sb.AppendLine($"**🔧 Action:** `{step.Action}` | **Input:** `{step.ActionInput[..Math.Min(150, step.ActionInput.Length)]}`");
+                    {
+                        var ai = step.ActionInput ?? "";
+                        sb.AppendLine($"**🔧 Action:** `{step.Action}` | **Input:** `{ai[..Math.Min(150, ai.Length)]}`");
+                    }
                     if (!string.IsNullOrEmpty(step.Observation))
-                        sb.AppendLine($"**👁️ Observation:** {step.Observation[..Math.Min(300, step.Observation.Length)]}...");
+                    {
+                        var obs = step.Observation;
+                        sb.AppendLine($"**👁️ Observation:** {obs[..Math.Min(300, obs.Length)]}...");
+                    }
                 }
                 sb.AppendLine();
             }

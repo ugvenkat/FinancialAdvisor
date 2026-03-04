@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using FinancialAdvisor.Agents;
 using FinancialAdvisor.Models;
 using FinancialAdvisor.Services;
 using FinancialAdvisor.Data;
@@ -27,21 +28,22 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> Start([FromBody] AnalysisRequest req)
     {
         if (req.Tickers == null || !req.Tickers.Any())
-            return BadRequest(new { error = "At least one ticker required" });
+            return BadRequest(new { code = "INVALID_REQUEST", message = "At least one ticker required" });
         if (req.Tickers.Count > 10)
-            return BadRequest(new { error = "Max 10 tickers per job" });
+            return BadRequest(new { code = "INVALID_REQUEST", message = "Max 10 tickers per job" });
 
         var job = await _orchestrator.StartJobAsync(req);
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
 
         return Accepted(new
         {
             job.JobId,
-            Status    = job.Status.ToString(),
+            Status        = job.Status.ToString(),
             job.Tickers,
             job.CreatedAt,
-            StatusUrl    = $"/api/analysis/{job.JobId}",
-            LiveStatusUrl = $"/api/analysis/{job.JobId}/live",
-            Message   = $"5-agent agentic analysis started for: {string.Join(", ", job.Tickers)}"
+            StatusUrl     = $"{baseUrl}/api/analysis/{job.JobId}",
+            LiveStatusUrl = $"{baseUrl}/api/analysis/{job.JobId}/live",
+            Message       = $"5-agent agentic analysis started for: {string.Join(", ", job.Tickers)}"
         });
     }
 
@@ -50,7 +52,7 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> Get(string jobId)
     {
         var job = await _orchestrator.GetJobAsync(jobId);
-        if (job == null) return NotFound(new { error = $"Job '{jobId}' not found" });
+        if (job == null) return NotFound(new { code = "JOB_NOT_FOUND", message = $"Job '{jobId}' not found" });
 
         return Ok(new
         {
@@ -63,6 +65,7 @@ public class AnalysisController : ControllerBase
                 ? Math.Round((job.CompletedAt.Value - job.CreatedAt).TotalSeconds, 1)
                 : Math.Round((DateTime.UtcNow - job.CreatedAt).TotalSeconds, 1),
             job.ErrorMessage,
+            job.FailedTickers,
             OutputDir = job.OutputDir,
             Reports   = job.Reports.Select(r => new
             {
@@ -80,8 +83,9 @@ public class AnalysisController : ControllerBase
                     r.Recommendation.TimeHorizon,
                     r.Recommendation.KeyCatalysts,
                     r.Recommendation.KeyRisks,
-                    CIOSummary  = r.Recommendation.CIOSummary.Length > 500
-                        ? r.Recommendation.CIOSummary[..500] : r.Recommendation.CIOSummary,
+                    CIOSummary  = string.IsNullOrEmpty(r.Recommendation.CIOSummary)
+                        ? r.Recommendation.CIOSummary
+                        : (r.Recommendation.CIOSummary.Length > 500 ? r.Recommendation.CIOSummary[..500] : r.Recommendation.CIOSummary),
                     Fundamental = new { r.Recommendation.Fundamental.Score, r.Recommendation.Fundamental.Grade, r.Recommendation.Fundamental.Strengths, r.Recommendation.Fundamental.Weaknesses },
                     Sentiment   = new { r.Recommendation.Sentiment.Overall, r.Recommendation.Sentiment.Score, r.Recommendation.Sentiment.BullishPercent, r.Recommendation.Sentiment.BearishPercent },
                     Risk        = new { r.Recommendation.Risk.Level, r.Recommendation.Risk.Score, r.Recommendation.Risk.RiskFactors }
@@ -98,7 +102,7 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> LiveStatus(string jobId)
     {
         var job     = await _memory.GetJobAsync(jobId);
-        if (job == null) return NotFound(new { error = $"Job '{jobId}' not found" });
+        if (job == null) return NotFound(new { code = "JOB_NOT_FOUND", message = $"Job '{jobId}' not found" });
 
         var status  = _tracker.Get(jobId);
         var elapsed = Math.Round((DateTime.UtcNow - job.CreatedAt).TotalSeconds, 1);
@@ -131,7 +135,7 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> GetTraces(string jobId)
     {
         var job = await _memory.GetJobAsync(jobId);
-        if (job == null) return NotFound(new { error = $"Job '{jobId}' not found" });
+        if (job == null) return NotFound(new { code = "JOB_NOT_FOUND", message = $"Job '{jobId}' not found" });
 
         var traces = await _memory.GetTracesAsync(jobId);
         return Ok(new
@@ -153,10 +157,11 @@ public class AnalysisController : ControllerBase
                         s.Thought,
                         s.Action,
                         s.ActionInput,
-                        Observation = s.Observation.Length > 200
-                            ? s.Observation[..200] + "..." : s.Observation,
+                        Observation = string.IsNullOrEmpty(s.Observation)
+                            ? s.Observation
+                            : (s.Observation.Length > 200 ? s.Observation[..200] + "..." : s.Observation),
                         s.IsFinal,
-                        FinalAnswer = s.IsFinal
+                        FinalAnswer = s.IsFinal && !string.IsNullOrEmpty(s.FinalAnswer)
                             ? s.FinalAnswer[..Math.Min(300, s.FinalAnswer.Length)] : null
                     })
                 })
@@ -187,11 +192,11 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> Report(string jobId)
     {
         var job = await _memory.GetJobAsync(jobId);
-        if (job == null) return NotFound(new { error = "Not found" });
-        if (job.Status != JobStatus.Completed) return BadRequest(new { error = $"Job is {job.Status} — not ready yet" });
+        if (job == null) return NotFound(new { code = "JOB_NOT_FOUND", message = $"Job '{jobId}' not found" });
+        if (job.Status != JobStatus.Completed) return BadRequest(new { code = "JOB_NOT_COMPLETE", message = $"Job is {job.Status} — not ready yet" });
 
         var path = Path.Combine(job.OutputDir ?? "", "report.md");
-        if (!System.IO.File.Exists(path)) return NotFound(new { error = "Report file missing" });
+        if (!System.IO.File.Exists(path)) return NotFound(new { code = "REPORT_MISSING", message = "Report file not found on disk" });
         return Content(await System.IO.File.ReadAllTextAsync(path), "text/markdown");
     }
 
