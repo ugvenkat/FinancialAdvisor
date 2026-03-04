@@ -1,0 +1,67 @@
+{
+  jobId 817C0C58,
+  status Completed,
+  tickers [
+    AAPL
+  ],
+  createdAt 2026-03-04T030214.4872386Z,
+  completedAt 2026-03-04T032652.8436908Z,
+  duration 1478.4,
+  errorMessage null,
+  outputDir .reports817C0C58,
+  reports [
+    {
+      ticker AAPL,
+      generatedAt 2026-03-04T032652.6168055Z,
+      totalAgentSteps 17,
+      recommendation {
+        action 3,
+        confidence 80,
+        riskLevel 2,
+        currentPrice null,
+        priceTarget 170,
+        upsidePercent null,
+        timeHorizon 6-12 months,
+        keyCatalysts [
+          1. Broad hardware refresh,
+          2. Ecosystem and valuation in focus,
+          3. New MacBooks powered by M5 chips
+        ],
+        keyRisks [],
+        cioSummary Action SellnConfidence 80%nPrice Target $170.00 (upside 7.0%, downside 6.9%)nTime Horizon Short-termnTop 3 Catalystsn1. Broad hardware refreshn2. Ecosystem and valuation in focusn3. New MacBooks powered by M5 chipsnTop 3 Risksn1. Beta of 1.27 (market risk)n2. PE ratio of 24.59 (valuation risk)n3. Debtequity of 0.12 (financial risk)nnCIO Investment Memo Based on the analysis, I recommend selling AAPL due to its high risk level and valuation concerns. The company's broad hardware refres,
+        fundamental {
+          score 50,
+          grade D,
+          strengths [
+            {metric Revenue Growth YoY, value 8.0%},,
+            {metric EPS Growth YoY, value 10.0%},,
+            {metric Current Price, value $182.88}
+          ],
+          weaknesses [
+            {metric PE Ratio, value 24.44},,
+            {metric DebtEquity, value NA},,
+            {metric Free Cash Flow, value $0.0B},
+            analyticalConclusion AAPL's high revenue growth rate and strong EPS growth rate indicate a promising future, but the high PE ratio and lack of cash generation are concerns. Considering the sector context, the PE ratio is reasonable, but further analysis is needed to determine the company's true value.
+          ]
+        },
+        sentiment {
+          overall 0,
+          score 0.35,
+          bullishPercent 0,
+          bearishPercent 0
+        },
+        risk {
+          level 2,
+          score 64,
+          riskFactors [
+            Risk Level Medium,
+            Top 3-5 Specific Risk Factors,
+            1. Beta 1.27 (Market Risk),
+            2. PE Ratio 24.59 (Valuation Risk),
+            3. DebtEquity 0.12 (Financial Risk)
+          ]
+        }
+      }
+    }
+  ]
+}
