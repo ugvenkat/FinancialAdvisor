@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinancialAdvisor — Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg:       #09090f;
+    --surface:  #13131e;
+    --border:   #252538;
+    --accent:   #00e5a0;
+    --accent2:  #6b96ff;
+    --accent3:  #ff7878;
+    --accent4:  #ffd97a;
+    --text:     #eeeef8;
+    --muted:    #9898b8;
+    --parallel: #b47aff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 48px 32px;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  header {
+    margin-bottom: 56px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .title-block { }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #8888aa;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    white-space: nowrap;
+  }
+
+  .badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7878a0;
+    margin-bottom: 16px;
+    padding-left: 4px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .card-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #8888aa;
+  }
+
+  /* ── Diagram rows ── */
+  .diagram { display: flex; flex-direction: column; gap: 0; }
+
+  /* Entry point */
+  .row-entry {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+
+  .entry-card {
+    width: 320px;
+    border-color: var(--accent2);
+    background: linear-gradient(135deg, #111118, #13132a);
+  }
+
+  .entry-card::before {
+    box-shadow: inset 0 0 40px rgba(79,124,255,0.06);
+  }
+
+  .entry-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* ── Arrow ── */
+  .arrow-down {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+    gap: 0;
+  }
+
+  .arrow-line {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, var(--border), var(--accent));
+  }
+
+  .arrow-tip {
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--accent);
+  }
+
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── Orchestrator ── */
+  .row-orchestrator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+
+  .orch-card {
+    width: 580px;
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #0d1a16, #111118);
+  }
+
+  .orch-card::before {
+    box-shadow: inset 0 0 60px rgba(0,229,160,0.05);
+  }
+
+  .orch-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .orch-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #9898b8;
+  }
+
+  .meta-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── Agent pipeline ── */
+  .pipeline-section {
+    margin: 0;
+    padding: 32px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .pipeline-section::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    background: linear-gradient(to bottom, var(--accent), var(--parallel));
+  }
+
+  .pipeline-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .pipeline-row:last-child { margin-bottom: 0; }
+
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .agent-card {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #0f0f1a;
+    position: relative;
+  }
+
+  .agent-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+
+  .agent-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #a0a0c0;
+    line-height: 1.5;
+  }
+
+  .agent-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .tool-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid;
+    opacity: 0.8;
+  }
+
+  /* Parallel band */
+  .parallel-group {
+    background: linear-gradient(135deg, #13101f, #0d0d14);
+    border: 1px solid rgba(155,89,255,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    flex: 1;
+  }
+
+  .parallel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--parallel);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .parallel-label::before, .parallel-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(155,89,255,0.25);
+  }
+
+  .parallel-agents {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .parallel-agent {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #0f0f1c;
+  }
+
+  .parallel-agent .agent-name { font-size: 12px; }
+
+  /* ── Persistence row ── */
+  .row-persistence {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .persist-card {
+    border-color: var(--border);
+  }
+
+  .persist-card.sqlite { border-color: rgba(255,209,102,0.4); }
+  .persist-card.reports { border-color: rgba(0,229,160,0.3); }
+
+  /* ── Tools row ── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  .tool-card {
+    padding: 14px 12px;
+    text-align: center;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .tool-card .icon { margin: 0 auto 8px; }
+
+  .tool-card-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .tool-card-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  /* ── Connector ── */
+  .connector {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0;
+  }
+
+  .connector-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Flow diagram (top section) ── */
+  .top-flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .flow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .flow-arrow-h {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    margin-top: 24px;
+  }
+
+  .h-line {
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(to right, var(--border), var(--accent));
+  }
+
+  .h-tip {
+    width: 0; height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid var(--accent);
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 40px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #9898b8;
+  }
+
+  .legend-swatch {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+
+  /* ── Main layout ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .left-col { display: flex; flex-direction: column; gap: 16px; }
+  .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Request flow card ── */
+  .flow-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .flow-card-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .flow-step {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+
+  .flow-step:last-child { border-bottom: none; }
+
+  .flow-step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: var(--border);
+    color: var(--text);
+  }
+
+  .flow-step-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #a0a0c0;
+    line-height: 1.4;
+  }
+
+  .flow-step-text strong { color: var(--text); }
+
+  /* accent colors by agent type */
+  .c-data    { color: var(--accent2);   border-color: rgba(79,124,255,0.4); }
+  .c-fund    { color: var(--accent);    border-color: rgba(0,229,160,0.4);  }
+  .c-sent    { color: var(--accent4);   border-color: rgba(255,209,102,0.4);}
+  .c-risk    { color: var(--accent3);   border-color: rgba(255,107,107,0.4);}
+  .c-cio     { color: var(--parallel);  border-color: rgba(155,89,255,0.4); }
+  .c-orch    { color: var(--accent);    border-color: rgba(0,229,160,0.4);  }
+
+  .bg-data   { background: rgba(79,124,255,0.15);  }
+  .bg-fund   { background: rgba(0,229,160,0.15);   }
+  .bg-sent   { background: rgba(255,209,102,0.15); }
+  .bg-risk   { background: rgba(255,107,107,0.15); }
+  .bg-cio    { background: rgba(155,89,255,0.15);  }
+  .bg-orch   { background: rgba(0,229,160,0.12);   }
+
+  .border-data { border-color: rgba(79,124,255,0.35) !important; }
+  .border-fund { border-color: rgba(0,229,160,0.35) !important;  }
+  .border-sent { border-color: rgba(255,209,102,0.35) !important;}
+  .border-risk { border-color: rgba(255,107,107,0.35) !important;}
+  .border-cio  { border-color: rgba(155,89,255,0.35) !important; }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .parallel-agents { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    .row-persistence { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <div class="title-block">
+      <div class="eyebrow">// system architecture</div>
+      <h1>Agentic <span>Financial Advisor</span></h1>
+      <div class="subtitle">.NET 8 WebAPI &nbsp;·&nbsp; ReAct Pattern &nbsp;·&nbsp; 5 Autonomous Agents</div>
+    </div>
+    <div class="badge">
+      <span class="dot"></span>
+      localhost:5000
+    </div>
+  </header>
+
+  <div class="main-grid">
+
+    <!-- LEFT: Request flow -->
+    <div class="left-col">
+      <div class="section-label">// request lifecycle</div>
+      <div class="flow-card">
+        <div class="flow-card-header">
+          <div class="card-title">POST /api/analysis</div>
+          <div class="card-sub">{ tickers: ["AAPL", "MSFT"] }</div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:rgba(79,124,255,0.2);color:var(--accent2)">1</div>
+          <div class="flow-step-text"><strong>Controller validates</strong><br>tickers, max 10 limit</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:rgba(0,229,160,0.15);color:var(--accent)">2</div>
+          <div class="flow-step-text"><strong>Job queued</strong><br>saved to SQLite, 202 returned</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:rgba(0,229,160,0.15);color:var(--accent)">3</div>
+          <div class="flow-step-text"><strong>Task.Run background</strong><br>Orchestrator fires async</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:rgba(155,89,255,0.15);color:var(--parallel)">4</div>
+          <div class="flow-step-text"><strong>Per-ticker pipeline</strong><br>5 agents in sequence/parallel</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:rgba(0,229,160,0.15);color:var(--accent)">5</div>
+          <div class="flow-step-text"><strong>Reports written</strong><br>JSON + Markdown to disk</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:rgba(79,124,255,0.2);color:var(--accent2)">6</div>
+          <div class="flow-step-text"><strong>Poll GET /{jobId}</strong><br>status, results, traces</div>
+        </div>
+      </div>
+
+      <!-- API Endpoints -->
+      <div class="section-label" style="margin-top:8px">// endpoints</div>
+      <div class="card">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent2);width:36px;flex-shrink:0">POST</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">/api/analysis</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);width:36px;flex-shrink:0">GET</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">/api/analysis/{id}</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);width:36px;flex-shrink:0">GET</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">/api/analysis/{id}/live</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);width:36px;flex-shrink:0">GET</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">/api/analysis/{id}/traces</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);width:36px;flex-shrink:0">GET</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">/api/analysis/{id}/report</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);width:36px;flex-shrink:0">GET</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">/api/health</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persistence -->
+      <div class="section-label" style="margin-top:8px">// persistence</div>
+      <div class="card persist-card sqlite">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div class="icon bg-sent" style="border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px">🗄️</div>
+          <div>
+            <div class="card-title">SQLite</div>
+            <div class="card-sub">SqliteMemoryStore</div>
+          </div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8">
+          jobs &nbsp;·&nbsp; reports &nbsp;·&nbsp; agent_traces
+        </div>
+      </div>
+
+      <div class="card persist-card reports">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div class="icon bg-fund" style="border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px">📄</div>
+          <div>
+            <div class="card-title">File Reports</div>
+            <div class="card-sub">ReportWriter → ./reports/{jobId}/</div>
+          </div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8">
+          report.json &nbsp;·&nbsp; report.md &nbsp;·&nbsp; {TICKER}.md &nbsp;·&nbsp; traces.md
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Agent pipeline -->
+    <div class="right-col">
+      <div class="section-label">// agent pipeline (per ticker)</div>
+
+      <div class="pipeline-section">
+
+        <!-- Agent 1 -->
+        <div class="pipeline-row">
+          <div class="step-num c-data bg-data border-data" style="border:1px solid">1</div>
+          <div class="agent-card border-data">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div class="agent-name">DataCollectionAgent</div>
+                <div class="agent-desc">Autonomously fetches all market data.<br>Runs until all sources collected.</div>
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(79,124,255,0.15);color:var(--accent2);border:1px solid rgba(79,124,255,0.3);white-space:nowrap">sequential</span>
+            </div>
+            <div class="agent-tools">
+              <span class="tool-tag c-data">get_stock_price</span>
+              <span class="tool-tag c-data">get_financial_ratios</span>
+              <span class="tool-tag c-data">get_latest_news</span>
+              <span class="tool-tag c-data">get_analyst_ratings</span>
+              <span class="tool-tag c-data">get_earnings_data</span>
+              <span class="tool-tag c-data">get_marketwatch_news</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider arrow -->
+        <div style="display:flex;padding:4px 0 4px 48px">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div style="width:1px;height:16px;background:var(--border)"></div>
+            <div style="width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--border)"></div>
+          </div>
+        </div>
+
+        <!-- Agents 2-4 parallel -->
+        <div class="pipeline-row">
+          <div class="step-num" style="background:rgba(155,89,255,0.15);color:var(--parallel);border:1px solid rgba(155,89,255,0.4);margin-top:8px">2–4</div>
+          <div class="parallel-group">
+            <div class="parallel-label">Task.WhenAll — runs in parallel</div>
+            <div class="parallel-agents">
+
+              <div class="parallel-agent border-fund">
+                <div class="agent-name c-fund">Fundamental</div>
+                <div class="agent-desc" style="margin-top:4px">P/E, EPS growth,<br>D/E, FCF scoring</div>
+                <div class="agent-tools" style="margin-top:6px">
+                  <span class="tool-tag c-fund" style="font-size:8px">calc_fundamental_score</span>
+                </div>
+              </div>
+
+              <div class="parallel-agent border-sent">
+                <div class="agent-name c-sent">Sentiment</div>
+                <div class="agent-desc" style="margin-top:4px">News headlines,<br>bull/bear/neutral</div>
+                <div class="agent-tools" style="margin-top:6px">
+                  <span class="tool-tag c-sent" style="font-size:8px">classify_sentiment</span>
+                </div>
+              </div>
+
+              <div class="parallel-agent border-risk">
+                <div class="agent-name c-risk">Risk</div>
+                <div class="agent-desc" style="margin-top:4px">Beta, valuation,<br>debt, sector risk</div>
+                <div class="agent-tools" style="margin-top:6px">
+                  <span class="tool-tag c-risk" style="font-size:8px">calculate_risk_score</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider arrow -->
+        <div style="display:flex;padding:4px 0 4px 48px">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div style="width:1px;height:16px;background:var(--border)"></div>
+            <div style="width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--border)"></div>
+          </div>
+        </div>
+
+        <!-- Agent 5 -->
+        <div class="pipeline-row">
+          <div class="step-num c-cio bg-cio border-cio" style="border:1px solid">5</div>
+          <div class="agent-card border-cio">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div class="agent-name">ChiefInvestmentOfficerAgent</div>
+                <div class="agent-desc">Synthesizes all agent outputs. Weighs conflicting signals.<br>Issues final Buy / Hold / Sell with price target + confidence.</div>
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(155,89,255,0.15);color:var(--parallel);border:1px solid rgba(155,89,255,0.3);white-space:nowrap">synthesizer</span>
+            </div>
+            <div class="agent-tools">
+              <span class="tool-tag c-cio">compute_price_target</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ReAct Engine -->
+      <div class="section-label" style="margin-top:8px">// shared engine</div>
+      <div class="card" style="border-color:rgba(0,229,160,0.3)">
+        <div style="display:flex;align-items:flex-start;gap:16px">
+          <div class="icon bg-orch" style="width:40px;height:40px;border-radius:10px;font-size:18px;flex-shrink:0">⚙️</div>
+          <div style="flex:1">
+            <div class="card-title">ReActEngine <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);font-weight:400">— shared by all 5 agents</span></div>
+            <div class="agent-desc" style="margin-top:6px;line-height:1.7">
+              Thought → Action → Observation loop &nbsp;·&nbsp; max 6 steps per agent<br>
+              LLM timeout: 180s &nbsp;·&nbsp; Tool timeout: 30s &nbsp;·&nbsp; Observation cap: 3000 chars
+            </div>
+            <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 9px;border-radius:4px;background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.25)">SanitizeActionInput()</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 9px;border-radius:4px;background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.25)">ParseLLMResponse()</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 9px;border-radius:4px;background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.25)">AgentStatusTracker</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ollama -->
+      <div class="section-label" style="margin-top:8px">// llm backend</div>
+      <div class="card" style="border-color:rgba(79,124,255,0.3)">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="icon bg-data" style="width:40px;height:40px;border-radius:10px;font-size:18px;flex-shrink:0">🤖</div>
+          <div>
+            <div class="card-title">OllamaService <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);font-weight:400">→ localhost:11434</span></div>
+            <div class="agent-desc" style="margin-top:4px">
+              llama3.1:8b &nbsp;·&nbsp; temperature 0.1 &nbsp;·&nbsp; 2048 tokens &nbsp;·&nbsp; /api/chat
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:rgba(79,124,255,0.3);border-color:var(--accent2)"></div>
+      Agent 1 — Data Collection
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:rgba(0,229,160,0.3);border-color:var(--accent)"></div>
+      Agent 2 — Fundamental
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:rgba(255,209,102,0.3);border-color:var(--accent4)"></div>
+      Agent 3 — Sentiment
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:rgba(255,107,107,0.3);border-color:var(--accent3)"></div>
+      Agent 4 — Risk
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:rgba(155,89,255,0.3);border-color:var(--parallel)"></div>
+      Agent 5 — CIO
+    </div>
+    <div class="legend-item" style="margin-left:auto">
+      <div style="width:20px;height:1px;background:linear-gradient(to right,var(--border),var(--accent))"></div>
+      sequential flow
+    </div>
+    <div class="legend-item">
+      <div style="width:20px;height:1px;background:linear-gradient(to right,var(--border),var(--parallel))"></div>
+      parallel execution
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

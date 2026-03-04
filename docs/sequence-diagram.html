@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinancialAdvisor — Sequence Diagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #f7f8fc;
+    font-family: 'Inter', sans-serif;
+    color: #1a1d2e;
+    padding: 48px 32px 80px;
+    min-width: 1320px;
+  }
+  header {
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 30px; font-weight: 700; color: #1a1d2e; }
+  h1 em { font-style: normal; color: #0ca678; }
+  .header-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #6b7280;
+    line-height: 2;
+  }
+  .svg-wrap { width: 100%; overflow-x: auto; }
+  svg { display: block; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 32px;
+    padding: 20px 24px;
+    background: #fff;
+    border: 1px solid #e2e5ef;
+    border-radius: 12px;
+  }
+  .legend-title {
+    width: 100%;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 2px;
+  }
+  .legend-item { display:flex; align-items:center; gap:7px; font-size:12px; color:#1a1d2e; }
+  .ls { display:inline-block; width:13px; height:13px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="eyebrow">// sequence diagram</div>
+    <h1>Agentic <em>Financial Advisor</em> — Request Flow</h1>
+  </div>
+  <div class="header-meta">
+    .NET 8 WebAPI &nbsp;·&nbsp; ReAct Pattern<br>
+    5 Autonomous Agents &nbsp;·&nbsp; Ollama LLM
+  </div>
+</header>
+
+<div class="svg-wrap">
+<!--
+  COLUMN X-CENTRES
+  Client=75  Orch=195  Data=315  Fund=430  Sent=545  Risk=660
+  CIO=775    Ollama=890  Yahoo=1005  SQLite=1120  Reporter=1235
+-->
+<svg width="1300" height="2460" viewBox="0 0 1300 2460" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="a-cl"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3b5bdb"/></marker>
+  <marker id="a-or"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#0ca678"/></marker>
+  <marker id="a-da"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4263eb"/></marker>
+  <marker id="a-fu"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#099268"/></marker>
+  <marker id="a-se"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#e67700"/></marker>
+  <marker id="a-ri"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c92a2a"/></marker>
+  <marker id="a-ci"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#7048e8"/></marker>
+  <marker id="a-ol"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1c7ed6"/></marker>
+  <marker id="a-ya"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#5f3dc4"/></marker>
+  <marker id="a-sq"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#d9480f"/></marker>
+  <marker id="a-rp"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#2f9e44"/></marker>
+  <marker id="a-rt"  markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#9ca3af"/></marker>
+  <marker id="a-rtl" markerWidth="8" markerHeight="8" refX="1" refY="3" orient="auto"><polygon points="8 0,0 3,8 6" fill="#9ca3af"/></marker>
+</defs>
+
+<!-- ══════════ ACTOR BOXES  y=18 ══════════ -->
+<rect x="25"   y="18" width="100" height="56" rx="10" fill="#edf2ff" stroke="#3b5bdb" stroke-width="1.5"/>
+<text x="75"  y="41"  text-anchor="middle" font-size="12" font-weight="700" fill="#3b5bdb" font-family="Inter,sans-serif">Client</text>
+<text x="75"  y="58"  text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">Swagger / App</text>
+
+<rect x="143"  y="18" width="104" height="56" rx="10" fill="#ebfbee" stroke="#0ca678" stroke-width="1.5"/>
+<text x="195" y="41"  text-anchor="middle" font-size="12" font-weight="700" fill="#0ca678" font-family="Inter,sans-serif">Orchestrator</text>
+<text x="195" y="58"  text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">MultiAgent</text>
+
+<rect x="259"  y="18" width="112" height="56" rx="10" fill="#edf2ff" stroke="#4263eb" stroke-width="1.5"/>
+<text x="315" y="37"  text-anchor="middle" font-size="12" font-weight="700" fill="#4263eb" font-family="Inter,sans-serif">Data</text>
+<text x="315" y="52"  text-anchor="middle" font-size="11" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">Collection</text>
+<text x="315" y="67"  text-anchor="middle" font-size="9"  fill="#6b7280" font-family="JetBrains Mono,monospace">Agent 1</text>
+
+<rect x="374"  y="18" width="112" height="56" rx="10" fill="#ebfbee" stroke="#099268" stroke-width="1.5"/>
+<text x="430" y="37"  text-anchor="middle" font-size="12" font-weight="700" fill="#099268" font-family="Inter,sans-serif">Fundamental</text>
+<text x="430" y="52"  text-anchor="middle" font-size="11" font-weight="600" fill="#099268" font-family="Inter,sans-serif">Analysis</text>
+<text x="430" y="67"  text-anchor="middle" font-size="9"  fill="#6b7280" font-family="JetBrains Mono,monospace">Agent 2</text>
+
+<rect x="489"  y="18" width="112" height="56" rx="10" fill="#fff9db" stroke="#e67700" stroke-width="1.5"/>
+<text x="545" y="37"  text-anchor="middle" font-size="12" font-weight="700" fill="#e67700" font-family="Inter,sans-serif">Sentiment</text>
+<text x="545" y="52"  text-anchor="middle" font-size="11" font-weight="600" fill="#e67700" font-family="Inter,sans-serif">Analysis</text>
+<text x="545" y="67"  text-anchor="middle" font-size="9"  fill="#6b7280" font-family="JetBrains Mono,monospace">Agent 3</text>
+
+<rect x="604"  y="18" width="112" height="56" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="1.5"/>
+<text x="660" y="37"  text-anchor="middle" font-size="12" font-weight="700" fill="#c92a2a" font-family="Inter,sans-serif">Risk</text>
+<text x="660" y="52"  text-anchor="middle" font-size="11" font-weight="600" fill="#c92a2a" font-family="Inter,sans-serif">Analysis</text>
+<text x="660" y="67"  text-anchor="middle" font-size="9"  fill="#6b7280" font-family="JetBrains Mono,monospace">Agent 4</text>
+
+<rect x="719"  y="18" width="112" height="56" rx="10" fill="#f3f0ff" stroke="#7048e8" stroke-width="1.5"/>
+<text x="775" y="37"  text-anchor="middle" font-size="12" font-weight="700" fill="#7048e8" font-family="Inter,sans-serif">CIO Decision</text>
+<text x="775" y="52"  text-anchor="middle" font-size="11" font-weight="600" fill="#7048e8" font-family="Inter,sans-serif">Synthesizer</text>
+<text x="775" y="67"  text-anchor="middle" font-size="9"  fill="#6b7280" font-family="JetBrains Mono,monospace">Agent 5</text>
+
+<rect x="838"  y="18" width="104" height="56" rx="10" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="1.5"/>
+<text x="890" y="41"  text-anchor="middle" font-size="12" font-weight="700" fill="#1c7ed6" font-family="Inter,sans-serif">Ollama LLM</text>
+<text x="890" y="58"  text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">llama3.1:8b</text>
+
+<rect x="950"  y="18" width="110" height="56" rx="10" fill="#f3f0ff" stroke="#5f3dc4" stroke-width="1.5"/>
+<text x="1005" y="41" text-anchor="middle" font-size="12" font-weight="700" fill="#5f3dc4" font-family="Inter,sans-serif">Yahoo Finance</text>
+<text x="1005" y="58" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">+ MarketWatch</text>
+
+<rect x="1065" y="18" width="110" height="56" rx="10" fill="#fff4e6" stroke="#d9480f" stroke-width="1.5"/>
+<text x="1120" y="41" text-anchor="middle" font-size="12" font-weight="700" fill="#d9480f" font-family="Inter,sans-serif">SQLite</text>
+<text x="1120" y="58" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">MemoryStore</text>
+
+<rect x="1180" y="18" width="110" height="56" rx="10" fill="#ebfbee" stroke="#2f9e44" stroke-width="1.5"/>
+<text x="1235" y="41" text-anchor="middle" font-size="12" font-weight="700" fill="#2f9e44" font-family="Inter,sans-serif">ReportWriter</text>
+<text x="1235" y="58" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">Files + JSON</text>
+
+<!-- ══════════ LIFELINES ══════════ -->
+<line x1="75"   y1="74" x2="75"   y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="195"  y1="74" x2="195"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="315"  y1="74" x2="315"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="430"  y1="74" x2="430"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="545"  y1="74" x2="545"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="660"  y1="74" x2="660"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="775"  y1="74" x2="775"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="890"  y1="74" x2="890"  y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="1005" y1="74" x2="1005" y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="1120" y1="74" x2="1120" y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+<line x1="1235" y1="74" x2="1235" y2="2420" stroke="#e2e5ef" stroke-width="1.5" stroke-dasharray="6,5"/>
+
+
+<!-- ══════════════════════════════════════════════
+     PHASE 1 — API REQUEST  (y=100)
+══════════════════════════════════════════════ -->
+<rect x="0" y="100" width="1300" height="28" fill="#f0fdf4"/>
+<text x="14" y="119" font-size="11" font-weight="700" fill="#0ca678" letter-spacing="0.08em" font-family="Inter,sans-serif">PHASE 1 — API REQUEST &amp; JOB SETUP</text>
+
+<!-- Orch activation -->
+<rect x="187" y="148" width="16" height="136" rx="3" fill="#ebfbee" stroke="#0ca678" stroke-width="1"/>
+
+<!-- 1. POST -->
+<line x1="75" y1="158" x2="185" y2="158" stroke="#3b5bdb" stroke-width="2" marker-end="url(#a-cl)"/>
+<text x="83"  y="151" font-size="12" font-weight="600" fill="#3b5bdb" font-family="Inter,sans-serif">POST /api/analysis</text>
+<text x="83"  y="169" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">{ tickers: ["AAPL", "MSFT"] }</text>
+
+<!-- 2. SaveJobAsync -->
+<line x1="203" y1="210" x2="1112" y2="210" stroke="#0ca678" stroke-width="2" marker-end="url(#a-or)"/>
+<text x="654" y="203" text-anchor="middle" font-size="12" font-weight="600" fill="#0ca678" font-family="Inter,sans-serif">SaveJobAsync(job)  —  status: Queued</text>
+<text x="654" y="220" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">persists job to SQLite immediately</text>
+
+<!-- 3. 202 Accepted -->
+<line x1="187" y1="260" x2="83" y2="260" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="83"  y="253" font-size="12" font-weight="600" fill="#3b5bdb" font-family="Inter,sans-serif">202 Accepted</text>
+<text x="83"  y="270" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">{ jobId, statusUrl, liveStatusUrl }</text>
+
+<!-- 4. Task.Run fire-and-forget -->
+<line x1="203" y1="308" x2="307" y2="308" stroke="#0ca678" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#a-or)"/>
+<text x="203" y="301" font-size="12" font-weight="600" fill="#0ca678" font-family="Inter,sans-serif">Task.Run  —  fire-and-forget background job</text>
+<text x="203" y="318" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">client polls GET /{jobId} separately while this runs</text>
+
+
+<!-- ══════════════════════════════════════════════
+     PHASE 2 — DATA COLLECTION  (y=348)
+══════════════════════════════════════════════ -->
+<rect x="0" y="344" width="1300" height="28" fill="#eff6ff"/>
+<text x="14" y="363" font-size="11" font-weight="700" fill="#4263eb" letter-spacing="0.08em" font-family="Inter,sans-serif">PHASE 2 — AGENT 1: DATA COLLECTION  (ReAct Loop — max 6 steps)</text>
+
+<!-- loop dashed border -->
+<rect x="258" y="382" width="790" height="572" rx="8" fill="none" stroke="#4263eb" stroke-width="1.5" stroke-dasharray="7,4"/>
+<text x="270" y="398" font-size="10" font-weight="700" fill="#4263eb" letter-spacing="0.1em" font-family="JetBrains Mono,monospace">loop  [max 6 steps · LLM timeout 180s · tool timeout 30s]</text>
+
+<!-- activation boxes -->
+<rect x="307" y="406" width="16" height="546" rx="3" fill="#edf2ff" stroke="#4263eb" stroke-width="1"/>
+<rect x="882" y="412" width="16" height="430" rx="3" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="1"/>
+<rect x="997" y="448" width="16" height="290" rx="3" fill="#f3f0ff" stroke="#5f3dc4" stroke-width="1"/>
+
+<!-- ① LLM: Thought -->
+<line x1="323" y1="422" x2="880" y2="422" stroke="#4263eb" stroke-width="2" marker-end="url(#a-da)"/>
+<text x="332" y="415" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">CompleteAsync(systemPrompt, history)</text>
+<text x="332" y="432" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">full conversation history sent on every LLM call</text>
+
+<line x1="882" y1="472" x2="325" y2="472" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="332" y="465" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">Thought: "I need the current stock price first…"</text>
+<text x="332" y="482" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">Action: get_stock_price  |  Action Input: { "ticker": "AAPL" }</text>
+
+<!-- ② Tool: get_stock_price → Yahoo -->
+<line x1="323" y1="522" x2="995" y2="522" stroke="#4263eb" stroke-width="2" marker-end="url(#a-da)"/>
+<text x="332" y="515" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">GET yahoo/v8/finance/chart/AAPL</text>
+<text x="332" y="532" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">price, 52-week range, market cap, beta, volume</text>
+
+<line x1="997" y1="568" x2="325" y2="568" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="332" y="561" font-size="12" font-weight="600" fill="#5f3dc4" font-family="Inter,sans-serif">{ price: 189.30,  pe: 28.4,  beta: 1.24,  cap: 2.94T }</text>
+<text x="332" y="578" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">Observation appended to history  →  loop continues</text>
+
+<!-- ③ Tool: get_financial_ratios -->
+<line x1="323" y1="620" x2="995" y2="620" stroke="#4263eb" stroke-width="2" marker-end="url(#a-da)"/>
+<text x="332" y="613" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">GET yahoo/v11/finance/quoteSummary — get_financial_ratios</text>
+<text x="332" y="630" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">P/B ratio, debt-to-equity, free cash flow, EPS growth</text>
+
+<line x1="997" y1="664" x2="325" y2="664" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="332" y="657" font-size="12" font-weight="600" fill="#5f3dc4" font-family="Inter,sans-serif">{ pb: 1.8,  de: 0.43,  fcf: 99B,  eps_growth: 0.12 }</text>
+
+<!-- ④ Tool: get_latest_news -->
+<line x1="323" y1="706" x2="995" y2="706" stroke="#4263eb" stroke-width="2" marker-end="url(#a-da)"/>
+<text x="332" y="699" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">GET yahoo/v2/finance/news — get_latest_news</text>
+<text x="332" y="716" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">latest RSS headlines, titles, source, published date</text>
+
+<line x1="997" y1="750" x2="325" y2="750" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="332" y="743" font-size="12" font-weight="600" fill="#5f3dc4" font-family="Inter,sans-serif">[ { title, source, link }, …  10 articles ]</text>
+
+<!-- ⑤ Tools: get_analyst_ratings + get_earnings_data -->
+<line x1="323" y1="792" x2="995" y2="792" stroke="#4263eb" stroke-width="2" marker-end="url(#a-da)"/>
+<text x="332" y="785" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">get_analyst_ratings  +  get_earnings_data</text>
+<text x="332" y="802" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">analyst consensus  ·  EPS actuals vs estimates</text>
+
+<line x1="997" y1="836" x2="325" y2="836" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="332" y="829" font-size="12" font-weight="600" fill="#5f3dc4" font-family="Inter,sans-serif">{ ratings: [Buy×8, Hold×3, Sell×1],  eps: [ … ] }</text>
+
+<!-- ⑥ FINAL ANSWER -->
+<line x1="323" y1="878" x2="880" y2="878" stroke="#4263eb" stroke-width="2" marker-end="url(#a-da)"/>
+<text x="332" y="871" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">CompleteAsync  —  FINAL ANSWER</text>
+<text x="332" y="888" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">all data gathered · LLM writes structured JSON summary</text>
+
+<line x1="882" y1="924" x2="325" y2="924" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="332" y="917" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">{ current_price, pe_ratio, news[…], analyst_ratings[…], … }</text>
+<text x="332" y="933" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">ParseCollectedData()  →  StockRawData model</text>
+
+<!-- SaveTraceAsync -->
+<line x1="315" y1="972" x2="1112" y2="972" stroke="#4263eb" stroke-width="1.5" marker-end="url(#a-da)"/>
+<text x="640" y="965" text-anchor="middle" font-size="12" font-weight="600" fill="#4263eb" font-family="Inter,sans-serif">SaveTraceAsync("DataCollectionAgent", trace)</text>
+<text x="640" y="980" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">all steps, thoughts, observations persisted to SQLite</text>
+
+<!-- return StockRawData -->
+<line x1="307" y1="1018" x2="201" y2="1018" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="254" y="1011" text-anchor="middle" font-size="12" font-weight="600" fill="#6b7280" font-family="Inter,sans-serif">StockRawData</text>
+<text x="254" y="1028" text-anchor="middle" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">price, ratios, news, ratings, earnings</text>
+
+
+<!-- ══════════════════════════════════════════════
+     PHASE 3 — PARALLEL AGENTS 2-4  (y=1062)
+══════════════════════════════════════════════ -->
+<rect x="0" y="1058" width="1300" height="28" fill="#fff9db"/>
+<text x="14" y="1077" font-size="11" font-weight="700" fill="#7048e8" letter-spacing="0.08em" font-family="Inter,sans-serif">PHASE 3 — AGENTS 2, 3, 4: PARALLEL ANALYSIS  (Task.WhenAll — all three run simultaneously)</text>
+
+<!-- par border -->
+<rect x="8" y="1096" width="1284" height="662" rx="10" fill="rgba(112,72,232,0.03)" stroke="rgba(112,72,232,0.25)" stroke-width="1.5" stroke-dasharray="7,4"/>
+<text x="22" y="1112" font-size="10" font-weight="700" fill="#7048e8" letter-spacing="0.12em" font-family="JetBrains Mono,monospace">par</text>
+
+<!-- ─── Agent 2: Fundamental ─── -->
+<text x="22" y="1132" font-size="10" font-weight="700" fill="#099268" font-family="Inter,sans-serif">Agent 2 — Fundamental</text>
+<rect x="422" y="1120" width="16" height="160" rx="3" fill="#ebfbee" stroke="#099268" stroke-width="1"/>
+<rect x="882" y="1126" width="16" height="128" rx="3" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="1"/>
+
+<line x1="195" y1="1126" x2="420" y2="1126" stroke="#099268" stroke-width="2" marker-end="url(#a-fu)"/>
+<text x="307" y="1119" text-anchor="middle" font-size="12" font-weight="600" fill="#099268" font-family="Inter,sans-serif">AnalyzeAsync(rawData)</text>
+<text x="307" y="1136" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">P/E, EPS growth, D/E, FCF, sector context</text>
+
+<line x1="438" y1="1172" x2="880" y2="1172" stroke="#099268" stroke-width="2" marker-end="url(#a-fu)"/>
+<text x="659" y="1165" text-anchor="middle" font-size="12" font-weight="600" fill="#099268" font-family="Inter,sans-serif">CompleteAsync  —  calculate_fundamental_score</text>
+<text x="659" y="1182" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">ReAct loop: reasons over metrics, calls scoring tool</text>
+
+<line x1="882" y1="1218" x2="440" y2="1218" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="661" y="1211" text-anchor="middle" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">FINAL ANSWER:  score=72 / 100,  grade=B</text>
+<text x="661" y="1228" text-anchor="middle" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">strengths[3], weaknesses[3], detailed analysis paragraph</text>
+
+<line x1="430" y1="1262" x2="1112" y2="1262" stroke="#099268" stroke-width="1.5" marker-end="url(#a-fu)"/>
+<text x="771" y="1256" text-anchor="middle" font-size="11" fill="#099268" font-family="Inter,sans-serif">SaveTraceAsync("FundamentalAnalysisAgent")</text>
+
+<line x1="422" y1="1296" x2="201" y2="1296" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="311" y="1289" text-anchor="middle" font-size="12" font-weight="600" fill="#6b7280" font-family="Inter,sans-serif">FundamentalScore</text>
+
+<!-- divider -->
+<line x1="16" y1="1322" x2="1284" y2="1322" stroke="rgba(112,72,232,0.18)" stroke-width="1" stroke-dasharray="4,3"/>
+
+<!-- ─── Agent 3: Sentiment ─── -->
+<text x="22" y="1346" font-size="10" font-weight="700" fill="#e67700" font-family="Inter,sans-serif">Agent 3 — Sentiment</text>
+<rect x="537" y="1334" width="16" height="160" rx="3" fill="#fff9db" stroke="#e67700" stroke-width="1"/>
+<rect x="882" y="1340" width="16" height="118" rx="3" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="1"/>
+
+<line x1="195" y1="1340" x2="535" y2="1340" stroke="#e67700" stroke-width="2" marker-end="url(#a-se)"/>
+<text x="365" y="1333" text-anchor="middle" font-size="12" font-weight="600" fill="#e67700" font-family="Inter,sans-serif">AnalyzeAsync(rawData)</text>
+<text x="365" y="1350" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">news headlines, article titles, source metadata</text>
+
+<line x1="553" y1="1388" x2="880" y2="1388" stroke="#e67700" stroke-width="2" marker-end="url(#a-se)"/>
+<text x="717" y="1381" text-anchor="middle" font-size="12" font-weight="600" fill="#e67700" font-family="Inter,sans-serif">CompleteAsync  —  classify_sentiment</text>
+<text x="717" y="1398" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">classifies each headline: Bullish / Neutral / Bearish</text>
+
+<line x1="882" y1="1434" x2="555" y2="1434" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="719" y="1427" text-anchor="middle" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">FINAL ANSWER:  Bullish  score=+0.42</text>
+<text x="719" y="1444" text-anchor="middle" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">60% Bullish  /  25% Neutral  /  15% Bearish</text>
+
+<line x1="545" y1="1474" x2="1112" y2="1474" stroke="#e67700" stroke-width="1.5" marker-end="url(#a-se)"/>
+<text x="829" y="1468" text-anchor="middle" font-size="11" fill="#e67700" font-family="Inter,sans-serif">SaveTraceAsync("SentimentAnalysisAgent")</text>
+
+<line x1="537" y1="1506" x2="201" y2="1506" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="369" y="1499" text-anchor="middle" font-size="12" font-weight="600" fill="#6b7280" font-family="Inter,sans-serif">SentimentScore</text>
+
+<!-- divider -->
+<line x1="16" y1="1530" x2="1284" y2="1530" stroke="rgba(112,72,232,0.18)" stroke-width="1" stroke-dasharray="4,3"/>
+
+<!-- ─── Agent 4: Risk ─── -->
+<text x="22" y="1554" font-size="10" font-weight="700" fill="#c92a2a" font-family="Inter,sans-serif">Agent 4 — Risk</text>
+<rect x="652" y="1542" width="16" height="160" rx="3" fill="#fff5f5" stroke="#c92a2a" stroke-width="1"/>
+<rect x="882" y="1548" width="16" height="118" rx="3" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="1"/>
+
+<line x1="195" y1="1548" x2="650" y2="1548" stroke="#c92a2a" stroke-width="2" marker-end="url(#a-ri)"/>
+<text x="422" y="1541" text-anchor="middle" font-size="12" font-weight="600" fill="#c92a2a" font-family="Inter,sans-serif">AnalyzeAsync(rawData)</text>
+<text x="422" y="1558" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">beta, valuation extremes, debt load, sector volatility</text>
+
+<line x1="668" y1="1596" x2="880" y2="1596" stroke="#c92a2a" stroke-width="2" marker-end="url(#a-ri)"/>
+<text x="774" y="1589" text-anchor="middle" font-size="12" font-weight="600" fill="#c92a2a" font-family="Inter,sans-serif">CompleteAsync  —  calculate_risk_score</text>
+<text x="774" y="1606" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">0–100 scale,  higher = riskier</text>
+
+<line x1="882" y1="1640" x2="670" y2="1640" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="776" y="1633" text-anchor="middle" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">FINAL ANSWER:  High  score=62 / 100</text>
+<text x="776" y="1650" text-anchor="middle" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">riskFactors: ["High P/E multiple", "Rate sensitivity", …]</text>
+
+<line x1="660" y1="1682" x2="1112" y2="1682" stroke="#c92a2a" stroke-width="1.5" marker-end="url(#a-ri)"/>
+<text x="886" y="1676" text-anchor="middle" font-size="11" fill="#c92a2a" font-family="Inter,sans-serif">SaveTraceAsync("RiskAnalysisAgent")</text>
+
+<line x1="652" y1="1714" x2="201" y2="1714" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="426" y="1707" text-anchor="middle" font-size="12" font-weight="600" fill="#6b7280" font-family="Inter,sans-serif">RiskScore</text>
+<!-- end par -->
+
+
+<!-- ══════════════════════════════════════════════
+     PHASE 4 — CIO AGENT  (y=1778)
+══════════════════════════════════════════════ -->
+<rect x="0" y="1772" width="1300" height="28" fill="#f3f0ff"/>
+<text x="14" y="1791" font-size="11" font-weight="700" fill="#7048e8" letter-spacing="0.08em" font-family="Inter,sans-serif">PHASE 4 — AGENT 5: CIO DECISION  (ReAct Loop)</text>
+
+<rect x="767" y="1812" width="16" height="236" rx="3" fill="#f3f0ff" stroke="#7048e8" stroke-width="1"/>
+<rect x="882" y="1818" width="16" height="200" rx="3" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="1"/>
+
+<line x1="195" y1="1812" x2="765" y2="1812" stroke="#7048e8" stroke-width="2" marker-end="url(#a-ci)"/>
+<text x="480" y="1805" text-anchor="middle" font-size="12" font-weight="600" fill="#7048e8" font-family="Inter,sans-serif">DecideAsync(rawData, fundamental, sentiment, risk)</text>
+<text x="480" y="1822" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">all three agent scores passed as context to CIO prompt</text>
+
+<line x1="783" y1="1862" x2="880" y2="1862" stroke="#7048e8" stroke-width="2" marker-end="url(#a-ci)"/>
+<text x="832" y="1855" text-anchor="middle" font-size="12" font-weight="600" fill="#7048e8" font-family="Inter,sans-serif">CompleteAsync</text>
+<text x="832" y="1872" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">weighs fundamental vs sentiment vs risk signals</text>
+
+<line x1="882" y1="1906" x2="785" y2="1906" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="834" y="1899" text-anchor="middle" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">Action: compute_price_target</text>
+<text x="834" y="1916" text-anchor="middle" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">{ eps: 6.43,  eps_growth: 0.12,  pe: 28,  action: "Buy" }</text>
+
+<line x1="783" y1="1954" x2="880" y2="1954" stroke="#7048e8" stroke-width="2" marker-end="url(#a-ci)"/>
+<text x="832" y="1947" text-anchor="middle" font-size="12" font-weight="600" fill="#7048e8" font-family="Inter,sans-serif">CompleteAsync  —  FINAL ANSWER</text>
+<text x="832" y="1964" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">synthesises everything into full investment memo</text>
+
+<line x1="882" y1="1998" x2="785" y2="1998" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="834" y="1991" text-anchor="middle" font-size="12" font-weight="600" fill="#1c7ed6" font-family="Inter,sans-serif">Buy  ·  78% confidence  ·  target $210</text>
+<text x="834" y="2008" text-anchor="middle" font-size="10" fill="#9ca3af" font-family="JetBrains Mono,monospace">keyCatalysts[…]  ·  keyRisks[…]  ·  timeHorizon: 12 months</text>
+
+<line x1="775" y1="2044" x2="1112" y2="2044" stroke="#7048e8" stroke-width="1.5" marker-end="url(#a-ci)"/>
+<text x="944" y="2037" text-anchor="middle" font-size="11" fill="#7048e8" font-family="Inter,sans-serif">SaveTraceAsync("CIOAgent")</text>
+
+<line x1="767" y1="2076" x2="201" y2="2076" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="484" y="2069" text-anchor="middle" font-size="12" font-weight="600" fill="#6b7280" font-family="Inter,sans-serif">InvestmentRecommendation  { Buy,  78%,  $210 }</text>
+
+
+<!-- ══════════════════════════════════════════════
+     PHASE 5 — SAVE & REPORTS  (y=2118)
+══════════════════════════════════════════════ -->
+<rect x="0" y="2112" width="1300" height="28" fill="#f0fdf4"/>
+<text x="14" y="2131" font-size="11" font-weight="700" fill="#2f9e44" letter-spacing="0.08em" font-family="Inter,sans-serif">PHASE 5 — PERSIST &amp; WRITE REPORTS</text>
+
+<line x1="195" y1="2158" x2="1112" y2="2158" stroke="#0ca678" stroke-width="2" marker-end="url(#a-or)"/>
+<text x="654" y="2151" text-anchor="middle" font-size="12" font-weight="600" fill="#0ca678" font-family="Inter,sans-serif">SaveReportAsync(jobId, stockReport)</text>
+<text x="654" y="2168" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">full report + recommendation stored in SQLite</text>
+
+<line x1="195" y1="2208" x2="1227" y2="2208" stroke="#2f9e44" stroke-width="2" marker-end="url(#a-rp)"/>
+<text x="711" y="2201" text-anchor="middle" font-size="12" font-weight="600" fill="#2f9e44" font-family="Inter,sans-serif">WriteReportAsync(jobId, portfolioReport)</text>
+<text x="711" y="2218" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">generates all output files for this job run</text>
+
+<rect x="1227" y="2220" width="16" height="100" rx="3" fill="#ebfbee" stroke="#2f9e44" stroke-width="1"/>
+<text x="1048" y="2240" font-size="11" fill="#2f9e44" font-weight="500" font-family="JetBrains Mono,monospace">→  report.json</text>
+<text x="1048" y="2260" font-size="11" fill="#2f9e44" font-weight="500" font-family="JetBrains Mono,monospace">→  report.md</text>
+<text x="1048" y="2280" font-size="11" fill="#2f9e44" font-weight="500" font-family="JetBrains Mono,monospace">→  AAPL.md</text>
+<text x="1048" y="2300" font-size="11" fill="#2f9e44" font-weight="500" font-family="JetBrains Mono,monospace">→  AAPL_agent_traces.md</text>
+
+<line x1="1227" y1="2338" x2="201" y2="2338" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#a-rtl)"/>
+<text x="714" y="2331" text-anchor="middle" font-size="12" font-weight="600" fill="#6b7280" font-family="Inter,sans-serif">outputDir = ./reports/{jobId}/</text>
+
+<line x1="195" y1="2368" x2="1112" y2="2368" stroke="#0ca678" stroke-width="2" marker-end="url(#a-or)"/>
+<text x="654" y="2361" text-anchor="middle" font-size="12" font-weight="600" fill="#0ca678" font-family="Inter,sans-serif">SaveJobAsync(status: Completed)</text>
+<text x="654" y="2378" text-anchor="middle" font-size="10" fill="#6b7280" font-family="JetBrains Mono,monospace">job.CompletedAt set  ·  FailedTickers logged if any</text>
+
+
+<!-- ══════════════════════════════════════════════
+     PHASE 6 — CLIENT POLLS  (y=2408)
+══════════════════════════════════════════════ -->
+<rect x="0" y="2402" width="1300" height="28" fill="#eff6ff"/>
+<text x="14" y="2421" font-size="11" font-weight="700" fill="#3b5bdb" letter-spacing="0.08em" font-family="Inter,sans-serif">PHASE 6 — CLIENT POLLS FOR RESULTS</text>
+
+<!-- footer note -->
+<line x1="0" y1="2445" x2="1300" y2="2445" stroke="#e2e5ef" stroke-width="1"/>
+<text x="14"   y="2458" font-size="10" fill="#9ca3af" font-family="Inter,sans-serif">Solid arrows = call  ·  Dashed arrows = return  ·  Dashed borders = loop / parallel blocks  ·  Activation boxes = participant is active</text>
+<text x="1286" y="2458" text-anchor="end" font-size="10" fill="#9ca3af" font-family="Inter,sans-serif">FinancialAdvisor · .NET 8</text>
+
+</svg>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-title">Actor Legend</div>
+  <div class="legend-item"><span class="ls" style="background:#edf2ff;border:1.5px solid #3b5bdb"></span>Client</div>
+  <div class="legend-item"><span class="ls" style="background:#ebfbee;border:1.5px solid #0ca678"></span>Orchestrator</div>
+  <div class="legend-item"><span class="ls" style="background:#edf2ff;border:1.5px solid #4263eb"></span>Data Agent (1)</div>
+  <div class="legend-item"><span class="ls" style="background:#ebfbee;border:1.5px solid #099268"></span>Fundamental Agent (2)</div>
+  <div class="legend-item"><span class="ls" style="background:#fff9db;border:1.5px solid #e67700"></span>Sentiment Agent (3)</div>
+  <div class="legend-item"><span class="ls" style="background:#fff5f5;border:1.5px solid #c92a2a"></span>Risk Agent (4)</div>
+  <div class="legend-item"><span class="ls" style="background:#f3f0ff;border:1.5px solid #7048e8"></span>CIO Agent (5)</div>
+  <div class="legend-item"><span class="ls" style="background:#e7f5ff;border:1.5px solid #1c7ed6"></span>Ollama LLM</div>
+  <div class="legend-item"><span class="ls" style="background:#f3f0ff;border:1.5px solid #5f3dc4"></span>Yahoo Finance</div>
+  <div class="legend-item"><span class="ls" style="background:#fff4e6;border:1.5px solid #d9480f"></span>SQLite</div>
+  <div class="legend-item"><span class="ls" style="background:#ebfbee;border:1.5px solid #2f9e44"></span>ReportWriter</div>
+</div>
+
+</body>
+</html>
